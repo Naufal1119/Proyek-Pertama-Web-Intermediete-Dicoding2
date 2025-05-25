@@ -87,6 +87,48 @@ export default class AddStoryPage {
       map.on('load', () => {
         map.addControl(new maplibregl.NavigationControl());
       });
+
+      // Add click event to map
+      map.on('click', (e) => {
+        const { lng, lat } = e.lngLat;
+        
+        // Remove existing marker and popup if any
+        if (marker) {
+          marker.remove();
+        }
+
+        // Create new marker
+        marker = new maplibregl.Marker({
+          draggable: true
+        })
+          .setLngLat([lng, lat])
+          .addTo(map);
+
+        // Create popup at clicked location
+        const popup = new maplibregl.Popup({ offset: 25 })
+          .setLngLat([lng, lat])
+          .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
+          .addTo(map);
+
+        // Add drag end event to update coordinates
+        marker.on('dragend', () => {
+          const { lng, lat } = marker.getLngLat();
+          popup.setLngLat([lng, lat])
+            .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
+          _updateMapLocation(lat, lng);
+        });
+
+        _updateMapLocation(lat, lng);
+      });
+
+      // Add cursor style on hover
+      map.on('mouseenter', 'map', () => {
+        map.getCanvas().style.cursor = 'crosshair';
+      });
+
+      map.on('mouseleave', 'map', () => {
+        map.getCanvas().style.cursor = '';
+      });
     };
 
     const _updateMapLocation = (lat, lng) => {
@@ -97,20 +139,6 @@ export default class AddStoryPage {
         center: newLocation,
         zoom: 15
       });
-
-      if (marker) {
-        marker.setLngLat(newLocation);
-      } else {
-        // Create marker with popup
-        marker = new maplibregl.Marker()
-          .setLngLat(newLocation)
-          .setPopup(new maplibregl.Popup({ offset: 25 })
-            .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`))
-          .addTo(map);
-        
-        // Show popup by default
-        marker.togglePopup();
-      }
 
       // Update hidden inputs
       latitudeInput.value = lat;
@@ -217,9 +245,32 @@ export default class AddStoryPage {
         const position = await getLocation();
         const { latitude, longitude } = position.coords;
         
-        latitudeInput.value = latitude;
-        longitudeInput.value = longitude;
-        
+        // Remove existing marker if any
+        if (marker) {
+          marker.remove();
+        }
+
+        // Create new marker
+        marker = new maplibregl.Marker({
+          draggable: true
+        })
+          .setLngLat([longitude, latitude])
+          .addTo(map);
+
+        // Create popup
+        const popup = new maplibregl.Popup({ offset: 25 })
+          .setLngLat([longitude, latitude])
+          .setHTML(`<strong>Location:</strong><br>Lat: ${latitude.toFixed(6)}<br>Lng: ${longitude.toFixed(6)}`)
+          .addTo(map);
+
+        // Add drag end event
+        marker.on('dragend', () => {
+          const { lng, lat } = marker.getLngLat();
+          popup.setLngLat([lng, lat])
+            .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
+          _updateMapLocation(lat, lng);
+        });
+
         _updateMapLocation(latitude, longitude);
       } catch (error) {
         console.error('Error getting location:', error);
