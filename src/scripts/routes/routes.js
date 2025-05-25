@@ -5,6 +5,7 @@ import DetailStoryPage from '../views/pages/detail-story-page';
 import LoginPresenter from '../presenters/login-presenter';
 import HomePresenter from '../presenters/home-presenter';
 import DetailStoryPresenter from '../presenters/detail-story-presenter';
+import AddStoryPresenter from '../presenters/add-story-presenter';
 
 const loginPage = new LoginPage();
 const loginPresenter = new LoginPresenter(loginPage);
@@ -18,10 +19,14 @@ const detailStoryPage = new DetailStoryPage();
 const detailStoryPresenter = new DetailStoryPresenter(detailStoryPage);
 detailStoryPage.setPresenter(detailStoryPresenter);
 
+const addStoryPage = new AddStoryPage();
+const addStoryPresenter = new AddStoryPresenter(addStoryPage);
+addStoryPage.setPresenter(addStoryPresenter);
+
 const routes = {
   '/': homePage,
   '/login': loginPage,
-  '/stories/add': new AddStoryPage(),
+  '/stories/add': addStoryPage,
   '/stories/:id': detailStoryPage,
   '/404': {
     render: () => '<h2>Page Not Found</h2>',

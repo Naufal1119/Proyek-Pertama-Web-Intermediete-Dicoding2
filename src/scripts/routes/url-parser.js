@@ -4,6 +4,7 @@ function extractPathnameSegments(path) {
   return {
     resource: splitUrl[1] || null,
     id: splitUrl[2] || null,
+    action: splitUrl[2] || null,
   };
 }
 
@@ -14,7 +15,9 @@ function constructRouteFromSegments(pathSegments) {
     pathname = pathname.concat(`/${pathSegments.resource}`);
   }
 
-  if (pathSegments.id) {
+  if (pathSegments.action === 'add') {
+    pathname = pathname.concat('/add');
+  } else if (pathSegments.id) {
     pathname = pathname.concat('/:id');
   }
 
@@ -49,6 +52,11 @@ export function parseActiveUrlWithCombiner() {
   const url = window.location.hash.slice(1).toLowerCase() || '/';
   const splitedUrl = url.split('/');
   const combinedUrl = splitedUrl[1] ? `/${splitedUrl[1]}` : '/';
+  
+  if (splitedUrl[2] === 'add') {
+    return `${combinedUrl}/add`;
+  }
+  
   const combinedUrlWithId = splitedUrl[2] ? `${combinedUrl}/:id` : combinedUrl;
   return combinedUrlWithId;
 }
