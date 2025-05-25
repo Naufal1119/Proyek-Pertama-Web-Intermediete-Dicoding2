@@ -1,8 +1,8 @@
-export default class AboutPage {
+export default class HomePage {
   async render() {
     return `
       <section class="container">
-        <h1>About Page</h1>
+        <h1>Home Page</h1>
       </section>
     `;
   }
@@ -10,4 +10,4 @@ export default class AboutPage {
   async afterRender() {
     // Do your job here
   }
-}
+} 
