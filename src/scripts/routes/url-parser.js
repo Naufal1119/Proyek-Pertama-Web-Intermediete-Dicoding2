@@ -44,3 +44,11 @@ export function getRoute(pathname) {
 export function parsePathname(pathname) {
   return extractPathnameSegments(pathname);
 }
+
+export function parseActiveUrlWithCombiner() {
+  const url = window.location.hash.slice(1).toLowerCase() || '/';
+  const splitedUrl = url.split('/');
+  const combinedUrl = splitedUrl[1] ? `/${splitedUrl[1]}` : '/';
+  const combinedUrlWithId = splitedUrl[2] ? `${combinedUrl}/:id` : combinedUrl;
+  return combinedUrlWithId;
+}

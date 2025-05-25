@@ -31,13 +31,11 @@ export default class LoginPage {
     this._form = document.getElementById('loginForm');
     this._form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const formData = {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-      };
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
       
       try {
-        const response = await this._presenter.login(formData);
+        const response = await this._presenter.login(email, password);
         if (response) {
           window.location.hash = '#/';
         }

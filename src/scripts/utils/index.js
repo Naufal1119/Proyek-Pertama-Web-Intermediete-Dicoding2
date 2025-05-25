@@ -10,3 +10,5 @@ export function showFormattedDate(date, locale = 'en-US', options = {}) {
 export function sleep(time = 1000) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
+
+export { initAuthListener, getUser, isAuthenticated } from './auth';

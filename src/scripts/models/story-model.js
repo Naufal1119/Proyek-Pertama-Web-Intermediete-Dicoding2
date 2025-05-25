@@ -1,74 +1,117 @@
-import CONFIG from '../config';
+import { getUser } from '../utils/auth';
 
 class StoryModel {
   constructor() {
-    this._baseUrl = CONFIG.BASE_URL;
+    this._baseUrl = 'https://story-api.dicoding.dev/v1';
   }
 
-  async getAllStories(page = 1, size = 10, location = 0) {
+  async getStories() {
     try {
-      const response = await fetch(`${this._baseUrl}/stories?page=${page}&size=${size}&location=${location}`, {
+      const user = getUser();
+      
+      if (!user || !user.token) {
+        throw new Error('User not authenticated');
+      }
+
+      console.log('Fetching stories with token:', user.token);
+
+      const response = await fetch(`${this._baseUrl}/stories`, {
         headers: {
-          'Authorization': `Bearer ${this._getToken()}`,
-        },
+          'Authorization': `Bearer ${user.token}`
+        }
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch stories');
+      }
+
       const responseJson = await response.json();
+      
       if (responseJson.error) {
         throw new Error(responseJson.message);
       }
+
       return responseJson.listStory;
     } catch (error) {
-      console.error('Error fetching stories:', error);
+      console.error('Error in getStories:', error);
       throw error;
     }
   }
 
   async getStoryById(id) {
     try {
+      const user = getUser();
+      
+      if (!user || !user.token) {
+        throw new Error('User not authenticated');
+      }
+
       const response = await fetch(`${this._baseUrl}/stories/${id}`, {
         headers: {
-          'Authorization': `Bearer ${this._getToken()}`,
-        },
+          'Authorization': `Bearer ${user.token}`
+        }
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch story');
+      }
+
       const responseJson = await response.json();
+      
       if (responseJson.error) {
         throw new Error(responseJson.message);
       }
+
       return responseJson.story;
     } catch (error) {
-      console.error('Error fetching story detail:', error);
+      console.error('Error in getStoryById:', error);
       throw error;
     }
   }
 
   async addStory(data) {
     try {
+      const user = getUser();
+      
+      if (!user || !user.token) {
+        throw new Error('User not authenticated');
+      }
+
       const formData = new FormData();
       formData.append('description', data.description);
       formData.append('photo', data.photo);
-      if (data.lat) formData.append('lat', data.lat);
-      if (data.lon) formData.append('lon', data.lon);
+      
+      if (data.lat && data.lon) {
+        formData.append('lat', data.lat);
+        formData.append('lon', data.lon);
+      }
 
       const response = await fetch(`${this._baseUrl}/stories`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this._getToken()}`,
+          'Authorization': `Bearer ${user.token}`
         },
-        body: formData,
+        body: formData
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add story');
+      }
+
       const responseJson = await response.json();
+      
       if (responseJson.error) {
         throw new Error(responseJson.message);
       }
+
       return responseJson;
     } catch (error) {
-      console.error('Error adding story:', error);
+      console.error('Error in addStory:', error);
       throw error;
     }
-  }
-
-  _getToken() {
-    return localStorage.getItem('token');
   }
 }
 
