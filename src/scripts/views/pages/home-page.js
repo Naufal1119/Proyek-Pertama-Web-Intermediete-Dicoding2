@@ -83,7 +83,6 @@ export default class HomePage {
         logoutButton.addEventListener('click', async () => {
           try {
             await this._presenter.logout();
-            window.location.hash = '#/login';
           } catch (error) {
             console.error('Error logging out:', error);
             alert('Failed to logout');

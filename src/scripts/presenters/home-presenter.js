@@ -1,5 +1,6 @@
 import StoryModel from '../models/story-model';
 import { setUser } from '../utils/auth';
+import Auth from '../utils/auth';
 
 class HomePresenter {
   constructor(view) {
@@ -21,6 +22,8 @@ class HomePresenter {
   async logout() {
     try {
       setUser(null);
+      Auth.removeToken();
+      window.location.hash = '#/login';
       return true;
     } catch (error) {
       throw error;
