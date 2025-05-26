@@ -1,6 +1,6 @@
 export default class RegisterPage {
   constructor() {
-    this._form = null;
+    this._presenter = null;
   }
 
   async render() {
@@ -19,7 +19,7 @@ export default class RegisterPage {
             </div>
             <div class="form-group">
               <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-input" id="password" required minlength="8">
+              <input type="password" class="form-input" id="password" required>
             </div>
             <button type="submit" class="register-button">Register</button>
           </form>
@@ -32,22 +32,24 @@ export default class RegisterPage {
   }
 
   async afterRender() {
-    this._form = document.getElementById('registerForm');
-    this._form.addEventListener('submit', async (event) => {
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-      };
       
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const userData = {
+        name,
+        email,
+        password,
+      };
+
       try {
-        const response = await this._presenter.register(formData);
-        if (response) {
-          window.location.hash = '#/login';
-        }
+        await this._presenter.register(userData);
       } catch (error) {
-        alert(error.message);
+        // Error handling is done in the presenter
       }
     });
   }

@@ -1,3 +1,18 @@
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #4a90e2;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 .detail-container {
   max-width: 800px;
   margin: 30px auto;
@@ -9,6 +24,8 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(45, 50, 80, 0.1);
 }
 
 .detail-image {

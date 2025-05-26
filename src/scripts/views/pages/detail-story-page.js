@@ -7,14 +7,15 @@ export default class DetailStoryPage {
 
   async render() {
     return `
+      <a href="#mainContent" class="skip-link">Skip to content</a>
       <div class="detail-container">
-        <div class="detail-card">
-          <div id="storyContent">
+        <article class="detail-card">
+          <div id="storyContent" role="main" id="mainContent">
             <div class="loading-spinner">
               <div class="spinner"></div>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     `;
   }
@@ -25,17 +26,17 @@ export default class DetailStoryPage {
     }
 
     return `
-      <img src="${this._story.photoUrl}" class="detail-image" alt="${this._story.description}">
+      <img src="${this._story.photoUrl}" class="detail-image" alt="Story photo by ${this._story.name}">
       <div class="detail-content">
-        <h5 class="detail-title">${this._story.name}</h5>
+        <h1 class="detail-title">${this._story.name}</h1>
         <p class="detail-description">${this._story.description}</p>
         ${this._story.lat && this._story.lon ? `
-          <div class="detail-location">
-            <h6 class="location-title">Location</h6>
-            <div id="detailMap" class="detail-map"></div>
+          <section class="detail-location" aria-labelledby="locationTitle">
+            <h2 id="locationTitle" class="location-title">Location</h2>
+            <div id="detailMap" class="detail-map" role="application" aria-label="Story location map"></div>
             <p class="location-coords">Latitude: ${this._story.lat}</p>
             <p class="location-coords">Longitude: ${this._story.lon}</p>
-          </div>
+          </section>
         ` : ''}
         <p class="detail-date">Posted on ${new Date(this._story.createdAt).toLocaleDateString()}</p>
       </div>

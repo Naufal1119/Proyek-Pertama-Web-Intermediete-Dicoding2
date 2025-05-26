@@ -9,6 +9,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 30px;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(45, 50, 80, 0.1);
 }
 
 .add-story-title {
@@ -32,7 +34,7 @@
 }
 
 .form-label {
-  color: #444;
+  color: #2D3250;
   font-weight: 500;
   font-size: 16px;
 }
@@ -47,8 +49,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  border-color: #94A6BC;
+  box-shadow: 0 0 0 2px rgba(148, 166, 188, 0.4);
 }
 
 .form-textarea {
@@ -111,7 +113,7 @@
 }
 
 .camera-button {
-  background-color: #4a90e2;
+  background-color: #94A6BC;
   color: white;
   padding: 12px 20px;
   border: none;
@@ -125,7 +127,7 @@
 }
 
 .camera-button:hover {
-  background-color: #357abd;
+  background-color: #7b8d9f;
 }
 
 .file-input {
@@ -146,7 +148,7 @@
 }
 
 .location-button {
-  background-color: #4CAF50;
+  background-color: #94A6BC;
   color: white;
   padding: 12px 20px;
   border: none;
@@ -163,11 +165,11 @@
 }
 
 .location-button:hover {
-  background-color: #45a049;
+  background-color: #7b8d9f;
 }
 
 .submit-button {
-  background-color: #4a90e2;
+  background-color: #2D3250;
   color: white;
   padding: 14px;
   border: none;
@@ -180,7 +182,7 @@
 }
 
 .submit-button:hover {
-  background-color: #357abd;
+  background-color: #1a1d2b;
 }
 
 .capture-button,
@@ -197,27 +199,27 @@
 }
 
 .capture-button {
-  background-color: #4CAF50;
+  background-color: #94A6BC;
   color: white;
 }
 
 .capture-button:hover {
-  background-color: #45a049;
+  background-color: #7b8d9f;
   transform: translateY(-2px);
 }
 
 .retake-button {
-  background-color: #2196F3;
+  background-color: #B4D4FF;
   color: white;
 }
 
 .retake-button:hover {
-  background-color: #1976D2;
+  background-color: #9cb9e6;
   transform: translateY(-2px);
 }
 
 .close-button {
-  background-color: #f44336;
+  background-color: #F44336;
   color: white;
 }
 

@@ -23,19 +23,19 @@ export default class AddStoryPage {
               <div class="photo-input-container">
                 <div id="cameraPreview" class="camera-preview" style="display: none;">
                   <video id="cameraVideo" class="camera-video"></video>
-                </div>
+            </div>
                 <div class="camera-buttons" style="display: none;">
                   <button type="button" id="captureButton" class="capture-button">Take Photo</button>
                   <button type="button" id="retakeButton" class="retake-button">Retake</button>
                   <button type="button" id="closeCameraButton" class="close-button">Close</button>
-                </div>
+            </div>
                 <div id="photoPreview" class="photo-preview"></div>
                 <div class="photo-controls">
                   <button type="button" id="cameraButton" class="camera-button">
                     <i class="fa fa-camera"></i> Open Camera
                   </button>
                   <input type="file" id="photo" name="photo" accept="image/*" class="file-input" required>
-                </div>
+              </div>
               </div>
             </div>
 

@@ -7,18 +7,23 @@ export default class HomePage {
 
   async render() {
     return `
+      <a href="#mainContent" class="skip-link">Skip to content</a>
       <div class="home-container">
-        <div class="home-header">
-          <h2 class="home-title">Stories</h2>
+        <header class="home-header">
+          <h1 class="home-title">Story App</h1>
           <div class="home-actions">
-            <button id="addStoryBtn" class="add-story-button">Add Story</button>
-            <button id="logoutBtn" class="logout-button">Logout</button>
+            <a href="#/add-story" class="add-story-button">Add Story</a>
+            <button id="logoutButton" class="logout-button">Logout</button>
           </div>
-        </div>
-        <div id="storiesMap" class="stories-map"></div>
-        <div id="storiesContainer" class="stories-grid">
-          ${this._renderStories()}
-        </div>
+        </header>
+        <main id="mainContent">
+          <div id="storiesMap" class="stories-map"></div>
+          <div id="storiesContainer" class="stories-grid">
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </main>
       </div>
     `;
   }
@@ -29,24 +34,24 @@ export default class HomePage {
     }
 
     return this._stories.map(story => `
-      <div class="story-card">
-        <img src="${story.photoUrl}" class="story-image" alt="${story.description}">
+      <article class="story-card">
+        <img src="${story.photoUrl}" class="story-image" alt="Story photo by ${story.name}">
         <div class="story-content">
-          <h5 class="story-title">${story.name}</h5>
+          <h2 class="story-title">${story.name}</h2>
           <p class="story-description">${story.description}</p>
           <div class="story-meta">
             <p class="story-date">
-              <i class="fa fa-calendar"></i> ${new Date(story.createdAt).toLocaleDateString()}
+              <i class="fa fa-calendar" aria-hidden="true"></i> ${new Date(story.createdAt).toLocaleDateString()}
             </p>
             ${story.lat && story.lon ? `
               <p class="story-location">
-                <i class="fa fa-map-marker"></i> Location: ${story.lat.toFixed(4)}, ${story.lon.toFixed(4)}
+                <i class="fa fa-map-marker" aria-hidden="true"></i> Location: ${story.lat.toFixed(4)}, ${story.lon.toFixed(4)}
               </p>
             ` : ''}
           </div>
           <a href="#/stories/${story.id}" class="read-more-button">Read More</a>
         </div>
-      </div>
+      </article>
     `).join('');
   }
 
@@ -277,17 +282,18 @@ export default class HomePage {
       // Initialize map after stories are loaded
       this._initializeMap();
 
-      const addStoryBtn = document.getElementById('addStoryBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
+      const addStoryLink = document.querySelector('.add-story-button');
+      const logoutButton = document.getElementById('logoutButton');
 
-      if (addStoryBtn) {
-        addStoryBtn.addEventListener('click', () => {
+      if (addStoryLink) {
+        addStoryLink.addEventListener('click', (event) => {
+          event.preventDefault();
           window.location.hash = '#/stories/add';
         });
       }
 
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+      if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
           try {
             await this._presenter.logout();
             window.location.hash = '#/login';

@@ -7,6 +7,7 @@
 
 body {
   font-family: 'Arial', sans-serif;
+  background-color: #EEF5FF; /* Light background */
 }
 
 .container {
@@ -16,7 +17,7 @@ body {
 }
 
 header {
-  background-color: lightskyblue;
+  background-color: #B4D4FF; /* Header background - Corrected */
 }
 
 .main-header {
