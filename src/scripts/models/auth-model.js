@@ -1,6 +1,7 @@
 import CONFIG from '../config';
+import Auth from '../utils/auth';
 
-class AuthModel {
+export default class AuthModel {
   constructor() {
     this._baseUrl = CONFIG.BASE_URL;
   }
@@ -15,6 +16,9 @@ class AuthModel {
         body: JSON.stringify(data),
       });
       const responseJson = await response.json();
+      if (!response.ok) {
+         throw new Error(responseJson.message || 'Registration failed');
+      }
       if (responseJson.error) {
         throw new Error(responseJson.message);
       }
@@ -35,10 +39,18 @@ class AuthModel {
         body: JSON.stringify(data),
       });
       const responseJson = await response.json();
+      if (!response.ok) {
+        throw new Error(responseJson.message || 'Login failed');
+      }
       if (responseJson.error) {
         throw new Error(responseJson.message);
       }
-      this._saveUserData(responseJson.loginResult);
+      if (responseJson.loginResult && responseJson.loginResult.token) {
+          Auth.setToken(responseJson.loginResult.token);
+      } else {
+           throw new Error('Login successful but token not received.');
+      }
+     
       return responseJson.loginResult;
     } catch (error) {
       console.error('Error logging in:', error);
@@ -46,25 +58,19 @@ class AuthModel {
     }
   }
 
-  _saveUserData(userData) {
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('userId', userData.userId);
-    localStorage.setItem('name', userData.name);
+  logout() {
+    Auth.removeToken();
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('name');
+  getToken() {
+    return Auth.getToken();
   }
 
   isLoggedIn() {
-    return !!this._getToken();
+    return !!Auth.getToken();
   }
 
-  _getToken() {
-    return localStorage.getItem('token');
+  getUser() {
+     return { token: Auth.getToken() };
   }
-}
-
-export default AuthModel; 
+} 

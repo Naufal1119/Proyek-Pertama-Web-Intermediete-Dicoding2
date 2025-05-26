@@ -1,47 +1,20 @@
-import { setUser, getUser } from '../utils/auth';
+import AuthModel from '../models/auth-model';
 
 class LoginPresenter {
   constructor(view) {
     this._view = view;
+    this._authModel = new AuthModel();
   }
 
   async login(email, password) {
     try {
       console.log('Attempting login with:', { email });
       
-      const response = await fetch('https://story-api.dicoding.dev/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const loginResult = await this._authModel.login({ email, password });
+      console.log('Login successful:', loginResult);
 
-      const responseJson = await response.json();
-      console.log('Login response:', responseJson);
-      
-      if (responseJson.error) {
-        throw new Error(responseJson.message);
-      }
-
-      // Pastikan token ada dalam response
-      if (!responseJson.loginResult?.token) {
-        throw new Error('Token tidak ditemukan dalam response');
-      }
-
-      // Simpan data user termasuk token
-      const userData = {
-        id: responseJson.loginResult.userId,
-        name: responseJson.loginResult.name,
-        token: responseJson.loginResult.token
-      };
-
-      console.log('Setting user data:', userData);
-      setUser(userData);
-
-      // Verifikasi data tersimpan
-      const savedUser = getUser();
-      console.log('Saved user data:', savedUser);
+      // Redirect to home page after successful login
+      window.location.hash = '#/';
 
       return true;
     } catch (error) {
@@ -52,7 +25,8 @@ class LoginPresenter {
 
   async logout() {
     try {
-      setUser(null);
+      this._authModel.logout();
+      window.location.hash = '#/login';
       return true;
     } catch (error) {
       throw error;

@@ -101,6 +101,25 @@ header {
 
 /* Write your styles more here */
 
+@media screen and (max-width: 768px) {
+  .container {
+    padding-inline: 16px; /* Reduce padding on smaller screens */
+  }
+
+  .main-header {
+    padding-block: 15px; /* Adjust header padding */
+    gap: 20px;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+  }
+
+  .drawer-button {
+     font-size: 24px;
+  }
+}
+
 @media screen and (width > 1000px) {
   .navigation-drawer {
     min-height: auto;

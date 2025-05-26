@@ -1,13 +1,15 @@
-import { getUser } from '../utils/auth';
+import CONFIG from '../config';
+import AuthModel from './auth-model';
 
-class StoryModel {
+export default class StoryModel {
   constructor() {
-    this._baseUrl = 'https://story-api.dicoding.dev/v1';
+    this._baseUrl = CONFIG.BASE_URL;
+    this._authModel = new AuthModel();
   }
 
   async getStories() {
     try {
-      const user = getUser();
+      const user = this._authModel.getUser();
       
       if (!user || !user.token) {
         throw new Error('User not authenticated');
@@ -41,7 +43,7 @@ class StoryModel {
 
   async getStoryById(id) {
     try {
-      const user = getUser();
+      const user = this._authModel.getUser();
       
       if (!user || !user.token) {
         throw new Error('User not authenticated');
@@ -73,7 +75,7 @@ class StoryModel {
 
   async addStory(data) {
     try {
-      const user = getUser();
+      const user = this._authModel.getUser();
       
       if (!user || !user.token) {
         throw new Error('User not authenticated');
@@ -113,6 +115,4 @@ class StoryModel {
       throw error;
     }
   }
-}
-
-export default StoryModel; 
+} 

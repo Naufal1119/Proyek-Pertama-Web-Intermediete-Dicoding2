@@ -1,8 +1,10 @@
 import CONFIG from "../config";
+import AuthModel from "../models/auth-model";
 
 export default class RegisterPresenter {
   constructor(view) {
     this._view = view;
+    this._authModel = new AuthModel();
   }
 
   async register(userData) {
@@ -17,24 +19,8 @@ export default class RegisterPresenter {
     }
 
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        // Handle API errors
-        throw new Error(responseData.message || 'Registration failed');
-      }
-      
-      if (responseData.error) {
-           throw new Error(responseData.message);
-      }
+      // Use AuthModel to handle registration fetch
+      const responseData = await this._authModel.register(userData);
 
       // Handle successful registration
       alert('User Registered Successfully! Please login.');

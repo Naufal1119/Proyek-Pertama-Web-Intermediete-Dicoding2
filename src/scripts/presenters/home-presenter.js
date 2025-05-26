@@ -9,7 +9,10 @@ class HomePresenter {
 
   async getStories() {
     try {
-      return await this._storyModel.getStories();
+      const stories = await this._storyModel.getStories();
+      this._view.displayStories(stories);
+      this._view.initializeMapWithStories(stories);
+      return stories;
     } catch (error) {
       throw error;
     }

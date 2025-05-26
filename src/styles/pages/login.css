@@ -73,4 +73,43 @@
 
 .register-link a:hover {
   text-decoration: underline;
+}
+
+@media screen and (max-width: 400px) {
+  .login-container,
+  .register-container { /* Apply to both login and register */
+    padding: 10px; /* Reduce padding on very small screens */
+  }
+
+  .login-card,
+  .register-card { /* Apply to both login and register */
+    padding: 15px; /* Adjust card padding */
+  }
+
+  .login-title,
+  .register-title { /* Apply to both login and register */
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .form-input,
+  .login-button,
+  .register-button { /* Apply to all relevant buttons/inputs */
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .form-group {
+     gap: 4px;
+  }
+
+  .form-label {
+     font-size: 14px;
+  }
+
+   .register-link,
+   .login-link {
+      margin-top: 15px;
+      font-size: 14px;
+   }
 } 

@@ -1,16 +1,23 @@
 import { getLocation } from '../../utils/location';
-import { takePicture } from '../../utils/camera';
+// import { takePicture } from '../../utils/camera'; // Remove direct import
 import '../../../styles/pages/add-story.css';
+import MapUtil from '../../utils/map-util'; // Import MapUtil here
+// import CameraUtil from '../../utils/camera'; // Import CameraUtil in Presenter
 
 export default class AddStoryPage {
   constructor() {
     this._presenter = null;
+    // Remove map and camera related properties from here
+    // this._map = null;
+    // this._marker = null;
+    // this._stream = null;
   }
 
   async render() {
     return `
       <div class="add-story-container">
         <div class="add-story-card">
+          <a href="#/" class="back-to-home-button" aria-label="Back to Home"><i class="fa fa-arrow-left"></i> Back</a>
           <h2 class="add-story-title">Add New Story</h2>
           <form id="addStoryForm" class="add-story-form">
             <div class="form-group">
@@ -19,7 +26,7 @@ export default class AddStoryPage {
             </div>
             
             <div class="form-group">
-              <label class="form-label">Photo:</label>
+              <label for="photo" class="form-label">Photo:</label>
               <div class="photo-input-container">
                 <div id="cameraPreview" class="camera-preview" style="display: none;">
                   <video id="cameraVideo" class="camera-video"></video>
@@ -57,430 +64,144 @@ export default class AddStoryPage {
   }
 
   async afterRender() {
+    // Get DOM elements
     const form = document.getElementById('addStoryForm');
     const cameraButton = document.getElementById('cameraButton');
     const getLocationButton = document.getElementById('getLocationButton');
     const photoInput = document.getElementById('photo');
     const photoPreview = document.getElementById('photoPreview');
-    const cameraPreview = document.getElementById('cameraPreview');
-    const cameraVideo = document.getElementById('cameraVideo');
-    const cameraButtons = document.querySelector('.camera-buttons');
-    const captureButton = document.getElementById('captureButton');
-    const retakeButton = document.getElementById('retakeButton');
-    const closeCameraButton = document.getElementById('closeCameraButton');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
 
-    let stream = null;
-    let map = null;
-    let marker = null;
-
-    const _initializeMap = () => {
-      if (map) return;
-
-      map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://api.maptiler.com/maps/streets/style.json?key=X5FvjDiGuHxAtiw6WFj7',
-        center: [106.8456, -6.2088], // Default to Jakarta
-        zoom: 12
-      });
-
-      map.on('load', () => {
-        // Add navigation control
-        map.addControl(new maplibregl.NavigationControl());
-
-        // Add layer control
-        const layerControl = document.createElement('div');
-        layerControl.className = 'maplibregl-ctrl maplibregl-ctrl-group map-layer-control';
-        layerControl.innerHTML = `
-          <button class="layer-control-button" title="Change Map Style">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17V12L12,17L2,12V17Z"/>
-            </svg>
-          </button>
-          <div class="layer-options" style="display: none;">
-            <button class="layer-option active" data-style="streets">Streets</button>
-            <button class="layer-option" data-style="satellite">Satellite</button>
-            <button class="layer-option" data-style="terrain">Terrain</button>
-            <button class="layer-option" data-style="dark">Dark</button>
-          </div>
-        `;
-
-        // Add layer control to map
-        const navControl = document.querySelector('.maplibregl-ctrl-group');
-        navControl.parentNode.insertBefore(layerControl, navControl.nextSibling);
-
-        // Add layer control styles
-        const style = document.createElement('style');
-        style.textContent = `
-          .map-layer-control {
-            position: relative;
-            background: white;
-            border-radius: 4px;
-            box-shadow: 0 0 10px 2px rgba(0,0,0,.1);
-            margin-top: 10px;
-          }
-          .layer-control-button {
-            width: 30px;
-            height: 30px;
-            padding: 3px;
-            border: none;
-            background: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            color: #404040;
-          }
-          .layer-control-button:hover {
-            background: #f0f0f0;
-          }
-          .layer-options {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 5px;
-            background: white;
-            padding: 8px;
-            border-radius: 4px;
-            box-shadow: 0 0 10px 2px rgba(0,0,0,.1);
-            min-width: 120px;
-            z-index: 2;
-          }
-          .layer-options.show {
-            display: block;
-          }
-          .layer-option {
-            display: block;
-            width: 100%;
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 12px;
-            text-align: center;
-            margin-bottom: 3px;
-          }
-          .layer-option:last-child {
-            margin-bottom: 0;
-          }
-          .layer-option:hover {
-            background: #f0f0f0;
-          }
-          .layer-option.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-          }
-        `;
-        document.head.appendChild(style);
-
-        // Add click handlers for layer control
-        const layerButton = layerControl.querySelector('.layer-control-button');
-        const layerOptions = layerControl.querySelector('.layer-options');
-        
-        layerButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          layerOptions.style.display = layerOptions.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Close layer options when clicking outside
-        document.addEventListener('click', (e) => {
-          if (!layerControl.contains(e.target)) {
-            layerOptions.style.display = 'none';
-          }
-        });
-
-        // Add click handlers for layer options
-        const options = layerControl.querySelectorAll('.layer-option');
-        options.forEach(option => {
-          option.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Remove active class from all options
-            options.forEach(opt => opt.classList.remove('active'));
-            // Add active class to clicked option
-            option.classList.add('active');
-
-            // Change map style based on selection
-            const style = option.dataset.style;
-            switch(style) {
-              case 'streets':
-                map.setStyle('https://api.maptiler.com/maps/streets/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-                break;
-              case 'satellite':
-                map.setStyle('https://api.maptiler.com/maps/hybrid/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-                break;
-              case 'terrain':
-                map.setStyle('https://api.maptiler.com/maps/topo/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-                break;
-              case 'dark':
-                map.setStyle('https://api.maptiler.com/maps/basic-dark/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-                break;
-            }
-            
-            // Hide options after selection
-            layerOptions.style.display = 'none';
-          });
-        });
-      });
-
-      // Add click event to map
-      map.on('click', (e) => {
-        const { lng, lat } = e.lngLat;
-        
-        // Remove existing marker and popup if any
-        if (marker) {
-          marker.remove();
-        }
-
-        // Create new marker
-        marker = new maplibregl.Marker({
-          draggable: true
-        })
-          .setLngLat([lng, lat])
-          .addTo(map);
-
-        // Create popup at clicked location
-        const popup = new maplibregl.Popup({ offset: 25 })
-          .setLngLat([lng, lat])
-          .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
-          .addTo(map);
-
-        // Add drag end event to update coordinates
-        marker.on('dragend', () => {
-          const { lng, lat } = marker.getLngLat();
-          popup.setLngLat([lng, lat])
-            .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
-          _updateMapLocation(lat, lng);
-        });
-
-        _updateMapLocation(lat, lng);
-      });
-
-      // Add cursor style on hover
-      map.on('mouseenter', 'map', () => {
-        map.getCanvas().style.cursor = 'crosshair';
-      });
-
-      map.on('mouseleave', 'map', () => {
-        map.getCanvas().style.cursor = '';
-      });
-    };
-
-    const _updateMapLocation = (lat, lng) => {
-      if (!map) return;
-
-      const newLocation = [lng, lat];
-      map.flyTo({
-        center: newLocation,
-        zoom: 15
-      });
-
-      // Update hidden inputs
-      latitudeInput.value = lat;
-      longitudeInput.value = lng;
-    };
-
-    const _startCamera = async () => {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          }
-        });
-        cameraVideo.srcObject = stream;
-        await cameraVideo.play();
-        cameraPreview.style.display = 'flex';
-        cameraButtons.style.display = 'flex';
-        captureButton.style.display = 'block';
-        retakeButton.style.display = 'none';
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        alert('Failed to access camera. Please make sure you have granted camera permissions.');
-      }
-    };
-
-    const _stopCamera = () => {
-      if (stream) {
-        stream.getTracks().forEach(track => {
-          track.stop();
-        });
-        stream = null;
-      }
-      if (cameraVideo.srcObject) {
-        cameraVideo.srcObject = null;
-      }
-      cameraPreview.style.display = 'none';
-      cameraButtons.style.display = 'none';
-    };
-
-    const _capturePhoto = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = cameraVideo.videoWidth;
-      canvas.height = cameraVideo.videoHeight;
-      const context = canvas.getContext('2d');
-      context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
-
-      const img = document.createElement('img');
-      img.src = canvas.toDataURL('image/jpeg', 0.8);
-      img.style.maxWidth = '100%';
-      photoPreview.innerHTML = '';
-      photoPreview.appendChild(img);
-
-      // Convert base64 to File object
-      canvas.toBlob((blob) => {
-        const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        photoInput.files = dataTransfer.files;
-      }, 'image/jpeg', 0.8);
-
-      captureButton.style.display = 'none';
-      retakeButton.style.display = 'block';
-      
-      // Stop camera stream after capturing photo
-      _stopCamera();
-    };
-
-    // Initialize map
-    _initializeMap();
-
-    // Handle camera button click
-    cameraButton.addEventListener('click', () => {
-      // Clear file input
-      photoInput.value = '';
-      photoPreview.innerHTML = '';
-      _startCamera();
-    });
-
-    // Handle capture button click
-    captureButton.addEventListener('click', _capturePhoto);
-
-    // Handle retake button click
-    retakeButton.addEventListener('click', () => {
-      photoPreview.innerHTML = '';
-      _startCamera();
-    });
-
-    // Handle close camera button click
-    closeCameraButton.addEventListener('click', () => {
-      _stopCamera();
-      // Don't clear the photo preview when closing camera
-    });
-
-    // Handle get location button click
-    getLocationButton.addEventListener('click', async () => {
-      try {
-        const position = await getLocation();
-        const { latitude, longitude } = position.coords;
-        
-        // Remove existing marker if any
-        if (marker) {
-          marker.remove();
-        }
-
-        // Create new marker
-        marker = new maplibregl.Marker({
-          draggable: true
-        })
-          .setLngLat([longitude, latitude])
-          .addTo(map);
-
-        // Create popup
-        const popup = new maplibregl.Popup({ offset: 25 })
-          .setLngLat([longitude, latitude])
-          .setHTML(`<strong>Location:</strong><br>Lat: ${latitude.toFixed(6)}<br>Lng: ${longitude.toFixed(6)}`)
-          .addTo(map);
-
-        // Add drag end event
-        marker.on('dragend', () => {
-          const { lng, lat } = marker.getLngLat();
-          popup.setLngLat([lng, lat])
-            .setHTML(`<strong>Location:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
-          _updateMapLocation(lat, lng);
-        });
-
-        _updateMapLocation(latitude, longitude);
-      } catch (error) {
-        console.error('Error getting location:', error);
-        alert('Failed to get location. Please try again.');
-      }
-    });
+    // Pass elements/IDs to presenter for handling map and camera
+    if (this._presenter && typeof this._presenter.initializeMap === 'function') {
+       this._presenter.initializeMap('map'); // Pass map container ID
+    }
+     if (this._presenter && typeof this._presenter.initializeCamera === 'function') {
+        this._presenter.initializeCamera(
+            'cameraVideo',
+            'cameraPreview',
+            '.camera-buttons',
+            'captureButton',
+            'retakeButton',
+            'closeCameraButton',
+            'photoPreview',
+            'photo'); // Pass camera related element IDs/selectors
+     }
 
     // Handle form submission
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      
-      const formData = new FormData(form);
-      const description = formData.get('description').trim();
-      const photo = formData.get('photo');
-      const lat = parseFloat(formData.get('latitude'));
-      const lon = parseFloat(formData.get('longitude'));
-
-      // Validate description
-      if (description.length < 1) {
-        alert('Please enter a description (minimum 1 character)');
-        return;
-      }
-
-      // Validate photo
-      if (!photo || photo.size === 0) {
-        alert('Please either take a photo or upload an image');
-        return;
-      }
-
-      // Validate location
-      if (isNaN(lat) || isNaN(lon)) {
-        alert('Please get your current location');
-        return;
-      }
-
-      const data = {
-        description,
-        photo,
-        lat,
-        lon
-      };
-
-      try {
-        await this._presenter.addStory(data);
-          window.location.hash = '#/';
-      } catch (error) {
-        console.error('Error adding story:', error);
-        alert('Failed to add story. Please try again.');
-      }
-    });
-
-    // Handle file input change
-    photoInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        // Clear camera preview if exists
-        _stopCamera();
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
         
-        // Display selected image
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.style.maxWidth = '100%';
-          photoPreview.innerHTML = '';
-          photoPreview.appendChild(img);
+        const description = document.getElementById('description').value;
+        const photo = photoInput.files[0];
+        const lat = parseFloat(latitudeInput.value);
+        const lon = parseFloat(longitudeInput.value);
+
+        const data = {
+          description,
+          photo,
+          lat,
+          lon
         };
-        reader.readAsDataURL(file);
-      }
-    });
+
+        if (this._presenter && typeof this._presenter.submitStory === 'function') {
+            this._presenter.submitStory(data); // Call presenter method
+        }
+      });
+    }
+
+    // Handle file input change (alternative to camera)
+     if (photoInput) {
+        photoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+             if (file) {
+                if (this._presenter && typeof this._presenter.handleFileSelect === 'function') {
+                     this._presenter.handleFileSelect(file, 'photoPreview'); // Call presenter method
+                }
+            }
+        });
+     }
+
+    // Handle camera button click
+    if (cameraButton) {
+        cameraButton.addEventListener('click', () => {
+            if (this._presenter && typeof this._presenter.startCamera === 'function') {
+                this._presenter.startCamera();
+            }
+        });
+    }
+    
+    // Handle Get Location button click
+    if (getLocationButton) {
+        getLocationButton.addEventListener('click', async () => {
+             if (this._presenter && typeof this._presenter.handleGetLocation === 'function') {
+                 this._presenter.handleGetLocation('latitude', 'longitude'); // Call presenter method
+            }
+        });
+    }
+
+    // Remove map and camera initialization/logic from here
+    // const _initializeMap = () => { ... }
+    // const _startCamera = async () => { ... }
+    // const _stopCamera = () => { ... }
+    // const _capturePhoto = () => { ... }
+    // map.on('click', ...) etc.
   }
 
   setPresenter(presenter) {
     this._presenter = presenter;
   }
+
+   // Methods called by presenter to update UI
+   displayPhotoPreview(imgSrc) {
+        const photoPreview = document.getElementById('photoPreview');
+        if (photoPreview) {
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '400px';
+            img.style.objectFit = 'contain';
+            img.alt = 'Photo preview';
+            photoPreview.innerHTML = '';
+            photoPreview.appendChild(img);
+        }
+   }
+   
+   clearPhotoPreview() {
+        const photoPreview = document.getElementById('photoPreview');
+        if (photoPreview) {
+            photoPreview.innerHTML = '';
+        }
+        const photoInput = document.getElementById('photo');
+        if (photoInput) {
+           photoInput.value = null; // Clear file input
+        }
+   }
+   
+   updateLocationInput(lat, lon) {
+       const latInput = document.getElementById('latitude');
+       const lonInput = document.getElementById('longitude');
+       if (latInput) {
+           latInput.value = lat;
+       }
+       if (lonInput) {
+           lonInput.value = lon;
+       }
+   }
+
+    // Method called by presenter to display location popup
+    displayLocationPopup(marker, lat, lon, map) {
+        // Format coordinates to 4 decimal places (or as needed for display)
+        const formattedLat = parseFloat(lat).toFixed(4);
+        const formattedLon = parseFloat(lon).toFixed(4);
+        
+        // Create and set popup content
+        const popupContent = `<b>Lat:</b> ${formattedLat}<br><b>Lon:</b> ${formattedLon}`; // Using simpler format for add story page
+
+        // Add popup to marker and open it immediately
+        const popup = MapUtil.addPopup(marker, popupContent);
+        popup.addTo(map);
+    }
 } 

@@ -224,10 +224,91 @@
 }
 
 .close-button:hover {
-  background-color: #d32f2f;
-  transform: translateY(-2px);
+  background-color: #e0a800;
 }
 
 .hidden {
   display: none;
+}
+
+.back-to-home-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: #333; /* Or your preferred color */
+  margin-bottom: 20px; /* Space between button and title */
+  font-size: 16px;
+}
+
+.back-to-home-button:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 600px) {
+  .add-story-container {
+    padding: 0 15px;
+  }
+
+  .add-story-card {
+    padding: 20px;
+  }
+
+  .add-story-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    gap: 8px;
+  }
+
+  .form-label {
+    font-size: 15px;
+  }
+
+  .form-input,
+  .file-input,
+  .camera-button,
+  .location-button,
+  .submit-button {
+    font-size: 15px;
+    padding: 10px 15px;
+  }
+
+  .camera-preview {
+    height: 300px;
+  }
+
+  .photo-preview {
+    min-height: 150px;
+  }
+
+  .photo-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .file-input,
+  .camera-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .map {
+    height: 250px;
+  }
+
+  .capture-button,
+  .retake-button,
+  .close-button {
+    min-width: auto;
+    padding: 10px 15px;
+    font-size: 15px;
+  }
+
+  .camera-buttons {
+    justify-content: space-around;
+  }
 } 

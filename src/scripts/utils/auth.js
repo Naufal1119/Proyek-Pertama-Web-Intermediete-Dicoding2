@@ -1,5 +1,28 @@
 const USER_KEY = 'user';
 
+const Auth = {
+    STORAGE_KEY: 'storyAppAuthToken',
+
+    getToken() {
+        return localStorage.getItem(this.STORAGE_KEY);
+    },
+
+    setToken(token) {
+        if (token) {
+            localStorage.setItem(this.STORAGE_KEY, token);
+        } else {
+            console.warn('Attempted to set null or undefined token. Removing existing token if any.');
+             localStorage.removeItem(this.STORAGE_KEY); // Ensure token is removed if set to null/undefined
+        }
+    },
+
+    removeToken() {
+        localStorage.removeItem(this.STORAGE_KEY);
+    }
+};
+
+export default Auth;
+
 export const initAuthListener = (callback) => {
   // Simulasi auth state change dengan event listener
   window.addEventListener('storage', (event) => {

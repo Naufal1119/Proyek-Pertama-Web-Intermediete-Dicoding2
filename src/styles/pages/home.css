@@ -173,4 +173,51 @@
   color: #666;
   padding: 40px;
   font-size: 18px;
+}
+
+.marker-popup {
+  max-width: 300px;
+  padding: 10px;
+}
+
+.marker-popup-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.marker-popup-content {
+  padding: 5px;
+}
+
+.marker-popup-content h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.marker-popup-content p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+@media screen and (max-width: 600px) {
+  .stories-map {
+    height: 300px; /* Reduce map height on smaller screens */
+  }
+
+  .stories-grid {
+    grid-template-columns: 1fr; /* Stack cards on very small screens */
+    gap: 15px;
+  }
+
+  .home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
 } 

@@ -1,8 +1,9 @@
+import MapUtil from '../../utils/map-util';
+
 export default class HomePage {
   constructor() {
     this._stories = [];
     this._map = null;
-    this._markers = [];
   }
 
   async render() {
@@ -55,232 +56,18 @@ export default class HomePage {
     `).join('');
   }
 
-  _initializeMap() {
-    // Remove existing map if any
-    if (this._map) {
-      this._map.remove();
-      this._map = null;
-    }
-
-    // Clear existing markers
-    this._markers = [];
-
-    // Default to Jakarta if no stories with location
-    const defaultCenter = [106.8456, -6.2088];
-    let center = defaultCenter;
-    let zoom = 12;
-
-    // If we have stories with location, center the map on the first one
-    const storiesWithLocation = this._stories.filter(story => story.lat && story.lon);
-    if (storiesWithLocation.length > 0) {
-      center = [storiesWithLocation[0].lon, storiesWithLocation[0].lat];
-      // If we have multiple stories, zoom out to show all
-      if (storiesWithLocation.length > 1) {
-        zoom = 10;
-      }
-    }
-
-    this._map = new maplibregl.Map({
-      container: 'storiesMap',
-      style: 'https://api.maptiler.com/maps/streets/style.json?key=X5FvjDiGuHxAtiw6WFj7',
-      center: center,
-      zoom: zoom
-    });
-
-    this._map.on('load', () => {
-      // Add navigation control
-      this._map.addControl(new maplibregl.NavigationControl());
-
-      // Add layer control
-      const layerControl = document.createElement('div');
-      layerControl.className = 'maplibregl-ctrl maplibregl-ctrl-group map-layer-control';
-      layerControl.innerHTML = `
-        <button class="layer-control-button" title="Change Map Style">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-            <path fill="currentColor" d="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17V12L12,17L2,12V17Z"/>
-          </svg>
-        </button>
-        <div class="layer-options" style="display: none;">
-          <button class="layer-option active" data-style="streets">Streets</button>
-          <button class="layer-option" data-style="satellite">Satellite</button>
-          <button class="layer-option" data-style="terrain">Terrain</button>
-          <button class="layer-option" data-style="dark">Dark</button>
-        </div>
-      `;
-
-      // Add layer control to map
-      const navControl = document.querySelector('.maplibregl-ctrl-group');
-      navControl.parentNode.insertBefore(layerControl, navControl.nextSibling);
-
-      // Add layer control styles
-      const style = document.createElement('style');
-      style.textContent = `
-        .map-layer-control {
-          position: relative;
-          background: white;
-          border-radius: 4px;
-          box-shadow: 0 0 10px 2px rgba(0,0,0,.1);
-          margin-top: 10px;
-        }
-        .layer-control-button {
-          width: 30px;
-          height: 30px;
-          padding: 3px;
-          border: none;
-          background: white;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
-          color: #404040;
-        }
-        .layer-control-button:hover {
-          background: #f0f0f0;
-        }
-        .layer-options {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          margin-top: 5px;
-          background: white;
-          padding: 8px;
-          border-radius: 4px;
-          box-shadow: 0 0 10px 2px rgba(0,0,0,.1);
-          min-width: 120px;
-          z-index: 2;
-        }
-        .layer-options.show {
-          display: block;
-        }
-        .layer-option {
-          display: block;
-          width: 100%;
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          background: white;
-          cursor: pointer;
-          transition: all 0.3s;
-          font-size: 12px;
-          text-align: center;
-          margin-bottom: 3px;
-        }
-        .layer-option:last-child {
-          margin-bottom: 0;
-        }
-        .layer-option:hover {
-          background: #f0f0f0;
-        }
-        .layer-option.active {
-          background: #4a90e2;
-          color: white;
-          border-color: #4a90e2;
-        }
-      `;
-      document.head.appendChild(style);
-
-      // Add click handlers for layer control
-      const layerButton = layerControl.querySelector('.layer-control-button');
-      const layerOptions = layerControl.querySelector('.layer-options');
-      
-      layerButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        layerOptions.style.display = layerOptions.style.display === 'none' ? 'block' : 'none';
-      });
-
-      // Close layer options when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!layerControl.contains(e.target)) {
-          layerOptions.style.display = 'none';
-        }
-      });
-
-      // Add click handlers for layer options
-      const options = layerControl.querySelectorAll('.layer-option');
-      options.forEach(option => {
-        option.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Remove active class from all options
-          options.forEach(opt => opt.classList.remove('active'));
-          // Add active class to clicked option
-          option.classList.add('active');
-
-          // Change map style based on selection
-          const style = option.dataset.style;
-          switch(style) {
-            case 'streets':
-              this._map.setStyle('https://api.maptiler.com/maps/streets/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-              break;
-            case 'satellite':
-              this._map.setStyle('https://api.maptiler.com/maps/hybrid/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-              break;
-            case 'terrain':
-              this._map.setStyle('https://api.maptiler.com/maps/topo/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-              break;
-            case 'dark':
-              this._map.setStyle('https://api.maptiler.com/maps/basic-dark/style.json?key=X5FvjDiGuHxAtiw6WFj7');
-              break;
-          }
-          
-          // Hide options after selection
-          layerOptions.style.display = 'none';
-        });
-      });
-
-      // Add markers for all stories with location
-      this._markers = storiesWithLocation.map(story => {
-        const marker = new maplibregl.Marker()
-          .setLngLat([story.lon, story.lat])
-          .addTo(this._map);
-
-        // Add popup to marker
-        const popup = new maplibregl.Popup({ offset: 25 })
-          .setLngLat([story.lon, story.lat])
-          .setHTML(`
-            <div class="map-popup">
-              <h6>${story.name}</h6>
-              <p>${story.description.substring(0, 100)}${story.description.length > 100 ? '...' : ''}</p>
-              <a href="#/stories/${story.id}" class="map-popup-link">View Story</a>
-            </div>
-          `);
-
-        // Bind popup to marker
-        marker.setPopup(popup);
-        return marker;
-      });
-
-      // If we have multiple stories, fit bounds to show all markers
-      if (this._markers.length > 1) {
-        const bounds = new maplibregl.LngLatBounds();
-        this._markers.forEach(marker => {
-          bounds.extend(marker.getLngLat());
-        });
-        this._map.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 15
-        });
-      }
-    });
-  }
-
   async afterRender() {
     try {
-      this._stories = await this._presenter.getStories();
+      // Fetch stories via presenter
+      this._presenter.getStories(); // Presenter will call displayStories and initializeMapWithStories
       
-      // Wait for the next tick to ensure DOM is rendered
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      const storiesContainer = document.getElementById('storiesContainer');
-      if (storiesContainer) {
-        storiesContainer.innerHTML = this._renderStories();
-      }
-
-      // Initialize map after stories are loaded
-      this._initializeMap();
+      // Remove direct story processing and map initialization from here
+      // await new Promise(resolve => setTimeout(resolve, 0));
+      // const storiesContainer = document.getElementById('storiesContainer');
+      // if (storiesContainer) {
+      //   storiesContainer.innerHTML = this._renderStories();
+      // }
+      // this._initializeMap();
 
       const addStoryLink = document.querySelector('.add-story-button');
       const logoutButton = document.getElementById('logoutButton');
@@ -311,5 +98,42 @@ export default class HomePage {
 
   setPresenter(presenter) {
     this._presenter = presenter;
+  }
+
+  // Method called by presenter to display stories
+  displayStories(stories) {
+    this._stories = stories; // Update internal stories data
+    const storiesContainer = document.getElementById('storiesContainer');
+    if (storiesContainer) {
+      // Ensure DOM is ready before rendering
+      requestAnimationFrame(() => {
+        storiesContainer.innerHTML = this._renderStories();
+      });
+    }
+  }
+
+  // Method called by presenter to initialize and display map with stories
+  initializeMapWithStories(stories) {
+     this._stories = stories; // Ensure map has access to stories data
+     // Default to Jakarta if no stories with location
+    const defaultCenter = [106.8456, -6.2088];
+    let center = defaultCenter;
+    let zoom = 12;
+
+    // If we have stories with location, center the map on the first one
+    const storiesWithLocation = this._stories.filter(story => story.lat && story.lon);
+    if (storiesWithLocation.length > 0) {
+      center = [storiesWithLocation[0].lon, storiesWithLocation[0].lat];
+      // If we have multiple stories, zoom out to show all
+      if (storiesWithLocation.length > 1) {
+        zoom = 10;
+      }
+    }
+
+    // Create map using MapUtil
+    this._map = MapUtil.createMap('storiesMap', center, zoom);
+
+    // Add markers for all stories with location
+    MapUtil.addMarkersWithStories(this._map, this._stories, 'storiesMap');
   }
 } 
