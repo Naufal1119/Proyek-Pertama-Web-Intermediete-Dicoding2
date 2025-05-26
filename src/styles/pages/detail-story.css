@@ -47,6 +47,15 @@
   margin: 0 0 10px 0;
 }
 
+.detail-map {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+}
+
 .location-coords {
   color: #666;
   margin: 0;

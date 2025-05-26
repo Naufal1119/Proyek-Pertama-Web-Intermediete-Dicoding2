@@ -21,21 +21,21 @@ export default class AddStoryPage {
             <div class="form-group">
               <label class="form-label">Photo:</label>
               <div class="photo-input-container">
-                <div id="cameraPreview" class="camera-preview">
+                <div id="cameraPreview" class="camera-preview" style="display: none;">
                   <video id="cameraVideo" class="camera-video"></video>
-                  <div class="camera-buttons">
-                    <button type="button" id="captureButton" class="capture-button">Take Photo</button>
-                    <button type="button" id="retakeButton" class="retake-button" style="display: none;">Retake</button>
-                    <button type="button" id="closeCameraButton" class="close-button">Close</button>
-            </div>
-            </div>
+                </div>
+                <div class="camera-buttons" style="display: none;">
+                  <button type="button" id="captureButton" class="capture-button">Take Photo</button>
+                  <button type="button" id="retakeButton" class="retake-button">Retake</button>
+                  <button type="button" id="closeCameraButton" class="close-button">Close</button>
+                </div>
                 <div id="photoPreview" class="photo-preview"></div>
                 <div class="photo-controls">
                   <button type="button" id="cameraButton" class="camera-button">
                     <i class="fa fa-camera"></i> Open Camera
                   </button>
                   <input type="file" id="photo" name="photo" accept="image/*" class="file-input" required>
-              </div>
+                </div>
               </div>
             </div>
 
@@ -64,6 +64,7 @@ export default class AddStoryPage {
     const photoPreview = document.getElementById('photoPreview');
     const cameraPreview = document.getElementById('cameraPreview');
     const cameraVideo = document.getElementById('cameraVideo');
+    const cameraButtons = document.querySelector('.camera-buttons');
     const captureButton = document.getElementById('captureButton');
     const retakeButton = document.getElementById('retakeButton');
     const closeCameraButton = document.getElementById('closeCameraButton');
@@ -298,6 +299,7 @@ export default class AddStoryPage {
         cameraVideo.srcObject = stream;
         await cameraVideo.play();
         cameraPreview.style.display = 'flex';
+        cameraButtons.style.display = 'flex';
         captureButton.style.display = 'block';
         retakeButton.style.display = 'none';
       } catch (error) {
@@ -317,6 +319,7 @@ export default class AddStoryPage {
         cameraVideo.srcObject = null;
       }
       cameraPreview.style.display = 'none';
+      cameraButtons.style.display = 'none';
     };
 
     const _capturePhoto = () => {
@@ -350,9 +353,6 @@ export default class AddStoryPage {
     // Initialize map
     _initializeMap();
 
-    // Start camera by default
-    _startCamera();
-
     // Handle camera button click
     cameraButton.addEventListener('click', () => {
       // Clear file input
@@ -367,17 +367,13 @@ export default class AddStoryPage {
     // Handle retake button click
     retakeButton.addEventListener('click', () => {
       photoPreview.innerHTML = '';
-      captureButton.style.display = 'block';
-      retakeButton.style.display = 'none';
       _startCamera();
     });
 
     // Handle close camera button click
     closeCameraButton.addEventListener('click', () => {
       _stopCamera();
-      photoPreview.innerHTML = '';
-      captureButton.style.display = 'block';
-      retakeButton.style.display = 'none';
+      // Don't clear the photo preview when closing camera
     });
 
     // Handle get location button click

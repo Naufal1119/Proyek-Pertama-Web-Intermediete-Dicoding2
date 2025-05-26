@@ -1,6 +1,8 @@
 export default class DetailStoryPage {
   constructor() {
     this._story = null;
+    this._map = null;
+    this._marker = null;
   }
 
   async render() {
@@ -30,6 +32,7 @@ export default class DetailStoryPage {
         ${this._story.lat && this._story.lon ? `
           <div class="detail-location">
             <h6 class="location-title">Location</h6>
+            <div id="detailMap" class="detail-map"></div>
             <p class="location-coords">Latitude: ${this._story.lat}</p>
             <p class="location-coords">Longitude: ${this._story.lon}</p>
           </div>
@@ -37,6 +40,36 @@ export default class DetailStoryPage {
         <p class="detail-date">Posted on ${new Date(this._story.createdAt).toLocaleDateString()}</p>
       </div>
     `;
+  }
+
+  _initializeMap() {
+    if (!this._story.lat || !this._story.lon) return;
+
+    this._map = new maplibregl.Map({
+      container: 'detailMap',
+      style: 'https://api.maptiler.com/maps/streets/style.json?key=X5FvjDiGuHxAtiw6WFj7',
+      center: [this._story.lon, this._story.lat],
+      zoom: 12
+    });
+
+    this._map.on('load', () => {
+      // Add navigation control
+      this._map.addControl(new maplibregl.NavigationControl());
+
+      // Add marker at story location
+      this._marker = new maplibregl.Marker()
+        .setLngLat([this._story.lon, this._story.lat])
+        .addTo(this._map);
+
+      // Add popup to marker
+      const popup = new maplibregl.Popup({ offset: 25 })
+        .setLngLat([this._story.lon, this._story.lat])
+        .setHTML(`<strong>Story Location</strong><br>Lat: ${this._story.lat}<br>Lng: ${this._story.lon}`)
+        .addTo(this._map);
+
+      // Bind popup to marker
+      this._marker.setPopup(popup);
+    });
   }
 
   async afterRender() {
@@ -47,6 +80,11 @@ export default class DetailStoryPage {
       this._story = await this._presenter.getStoryById(storyId);
       const storyContent = document.getElementById('storyContent');
       storyContent.innerHTML = this._renderStory();
+
+      // Initialize map after story content is rendered
+      if (this._story.lat && this._story.lon) {
+        this._initializeMap();
+      }
     } catch (error) {
       console.error('Error loading story:', error);
       alert('Failed to load story details');
