@@ -1,0 +1,59 @@
+[33mcommit b00c9dbbca84f70d9a57dbb179fdd75957c90b81[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mlengkap[m[33m)[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 10:03:52 2025 +0800
+
+    menambahkan fitur map dalam detail story
+
+[33mcommit 875881327b82323e954a590f3b8842795cafe216[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 07:59:15 2025 +0800
+
+    menambahkan map di homepage
+
+[33mcommit 102fc0e80d3afe3d5b2a3c1104fdcf8b41051f21[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 07:38:50 2025 +0800
+
+    fitur menambahkan marker di map
+
+[33mcommit dbc6634ae7f8354b241ca8e3591f196245a93700[m[33m ([m[1;31morigin/lengkap[m[33m)[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 07:30:51 2025 +0800
+
+    menambahkan form validation pada add-story agar mengisi formnya sebelum diupload, membahkan fitur preview camera dan upload gambar, juga menambahkan marker dengan current location(belum bisa diclic)
+
+[33mcommit d7cf436c2b4ff69fe07127ced83b81f9f86570c2[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 06:52:41 2025 +0800
+
+    menggungah ke branch lengkap dan fiturnya lumayan lengkap sisa menambahkan fitur map dan aksesibiltas dan transition api
+
+[33mcommit 58a261a791a1bb45605b69e8f83981940773690c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 05:48:04 2025 +0800
+
+    stories sudah muncul, login dan register page sudah bisa, detail story sudah ada juga
+
+[33mcommit 3a14871ba2b441cef6e1718f1556a17c97fff40d[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 05:24:38 2025 +0800
+
+    menambahkan views page beserta stylenya dan menambahkan authmodel dan story-model
+
+[33mcommit 3fc828d01e1d8641a2a0cf1580a003f2882bc08d[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 05:08:20 2025 +0800
+
+    structure baru
+
+[33mcommit 76b3d2112ed4ded2a43d0f948794b34a9d26ed43[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 03:54:56 2025 +0800
+
+    menambahkan .gitignore
+
+[33mcommit fc64d78e9d1b0a5ce7f52919d955165e49d04498[m
+Author: Naufal1119 <nacosaja@gmail.com>
+Date:   Mon May 26 03:11:15 2025 +0800
+
+    initial commit
